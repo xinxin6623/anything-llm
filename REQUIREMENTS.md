@@ -1,4 +1,4 @@
-# 个人知识库管理器 — 需求定义 v1.0
+# 个人知识库管理器 — 需求定义 v1.1
 
 基于 AnythingLLM 二次开发，在现有界面上新增「个人知识库管理器」功能模块。
 
@@ -160,6 +160,120 @@
 
 ---
 
+### 模块6（新）：文件操作助手
+
+基于已建立的索引，通过自然语言描述对文件进行批量操作。
+
+**支持的操作类型：**
+
+| 操作 | 示例 |
+|------|------|
+| 智能重命名 | `IMG_20240315.jpg` → `2024年3月-杭州西湖旅行.jpg` |
+| 自动归档 | 按分类/日期自动移动文件到对应目录 |
+| 批量重命名 | 「把所有2024年的财务报表加上年份前缀」 |
+| 重复文件检测 | 内容相似度对比，提示合并建议 |
+| 摘要写入元数据 | 把 LLM 生成的摘要写入文件元数据 |
+
+**交互流程（安全优先）：**
+```
+用户输入自然语言指令
+    ↓
+系统解析意图，匹配文件
+    ↓
+展示「操作预览」（将要改动什么）
+    ↓
+用户确认
+    ↓
+执行 + 写入操作日志（支持回滚）
+```
+
+---
+
+### 模块7（新）：Agent 自动化
+
+#### P5：接入 AnythingLLM 现有 Agent 框架
+
+将知识库操作封装为 Agent 工具，在现有聊天界面通过 `@agent` 触发，无需额外界面。
+
+**工具集：**
+
+| 工具名 | 功能 |
+|--------|------|
+| `search_files` | 按自然语言搜索文件 |
+| `get_file_info` | 获取文件详情、摘要、关键词 |
+| `rename_file` | 重命名文件 |
+| `move_file` | 移动文件到目录 |
+| `list_category` | 列出某分类下所有文件 |
+| `batch_embed` | 触发向量化 |
+| `create_category` | 新建分类 |
+| `merge_category` | 合并两个分类 |
+| `preview_changes` | 预览批量操作（不执行） |
+| `execute_changes` | 确认执行变更 |
+
+**使用示例：**
+```
+你：「把所有没有明确日期的合同文件，按内容推断日期后重命名，移到合同目录下」
+
+Agent 自动执行：
+  1. search_files(category="合同")
+  2. get_file_info(file_id) × N
+  3. preview_changes(operations=[...])
+  4. 等待用户确认
+  5. execute_changes()
+  6. 返回操作报告
+```
+
+#### P6：封装为 MCP Server
+
+将全套知识库工具封装为标准 MCP（Model Context Protocol）Server，使 Claude Desktop 等任何支持 MCP 的客户端都能直接操作本地文件库。
+
+**优势：**
+- 标准协议，不依赖 AnythingLLM 界面
+- Claude Desktop 可直接调用
+- 便于未来对接其他 AI 工具
+
+**MCP Server 暴露的能力：** 与 P5 工具集相同，以 MCP 标准协议包装。
+
+---
+
+## 三、数据存储规划
+
+| 数据 | 存储位置 | 说明 |
+|------|---------|------|
+| 索引数据库 | `server/storage/knowledgebase.db` | 新建 SQLite，独立于主库 |
+| 向量数据 | `server/storage/lancedb/` | 复用现有 LanceDB |
+| 目录配置 | 现有 `anythingllm.db` SystemSettings 表 | 存储路径等配置项 |
+| 操作日志 | `server/storage/knowledgebase.db` 独立表 | 文件操作历史，支持回滚 |
+| 临时文件 | `collector/hotdir/` | Collector 处理中转，完成后清理 |
+
+---
+
+## 四、技术实现路径
+
+### 前端
+- 主 Sidebar 新增知识库入口图标
+- 新建路由 `/knowledge-base`（及子路由）
+- 页面风格复用现有 Tailwind CSS + Phosphor Icons
+- 实时进度使用 SSE（与现有聊天流机制相同）
+
+### 后端
+- 新建端点：`server/endpoints/knowledgeBase.js`
+- 新建工具类目录：`server/utils/KnowledgeBase/`
+  - `scanner.js` — 文件扫描、hash 计算、增量检测
+  - `classifier.js` — 调用 LLM 自动分类
+  - `indexer.js` — 索引数据库 CRUD
+  - `embedder.js` — 向量化调度
+  - `searcher.js` — 关键词 + 语义搜索
+  - `fileOps.js` — 文件重命名、移动、操作日志
+  - `agentTools.js` — Agent 工具注册
+  - `mcpServer.js` — MCP Server 实现
+
+### 容器适配
+- `docker-compose.yml` 新增宿主机文件目录 volume 挂载
+- 用户在界面指定的目录需映射进容器才能访问
+
+---
+
 ## 五、开发阶段
 
 | 阶段 | 内容 | 状态 |
@@ -168,3 +282,5 @@
 | P2 | LLM 自动分类 + 分类管理界面 | 待开发 |
 | P3 | 向量化管理 + 实时进度展示 | 待开发 |
 | P4 | 自然语言搜索界面（关键词 + 语义） | 待开发 |
+| P5 | 文件操作助手 + 接入 AnythingLLM Agent | 待开发 |
+| P6 | 封装为 MCP Server（支持 Claude Desktop） | 待开发 |
