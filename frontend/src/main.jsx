@@ -372,6 +372,83 @@ const router = createBrowserRouter([
           return { element: <ManagerRoute Component={MobileConnections} /> };
         },
       },
+      // Knowledge Base routes
+      {
+        path: "/knowledge-base",
+        lazy: async () => {
+          const { default: KnowledgeBaseHome } = await import(
+            "@/pages/KnowledgeBase"
+          );
+          return { element: <PrivateRoute Component={KnowledgeBaseHome} /> };
+        },
+      },
+      {
+        path: "/knowledge-base/quick-start",
+        lazy: async () => {
+          const { default: KnowledgeBaseQuickStart } = await import(
+            "@/pages/KnowledgeBase/QuickStart"
+          );
+          return { element: <PrivateRoute Component={KnowledgeBaseQuickStart} /> };
+        },
+      },
+      {
+        path: "/knowledge-base/config",
+        lazy: async () => {
+          const { default: KnowledgeBaseConfig } = await import(
+            "@/pages/KnowledgeBase/Config"
+          );
+          return { element: <PrivateRoute Component={KnowledgeBaseConfig} /> };
+        },
+      },
+      {
+        path: "/knowledge-base/files",
+        lazy: async () => {
+          const { default: KnowledgeBaseFiles } = await import(
+            "@/pages/KnowledgeBase/Files"
+          );
+          return { element: <PrivateRoute Component={KnowledgeBaseFiles} /> };
+        },
+      },
+      {
+        path: "/knowledge-base/categories",
+        lazy: async () => {
+          const { default: KnowledgeBaseCategories } = await import(
+            "@/pages/KnowledgeBase/Categories"
+          );
+          return {
+            element: <PrivateRoute Component={KnowledgeBaseCategories} />,
+          };
+        },
+      },
+      {
+        path: "/knowledge-base/embed",
+        lazy: async () => {
+          const { default: KnowledgeBaseEmbed } = await import(
+            "@/pages/KnowledgeBase/Embed"
+          );
+          return { element: <PrivateRoute Component={KnowledgeBaseEmbed} /> };
+        },
+      },
+      {
+        path: "/knowledge-base/search",
+        lazy: async () => {
+          const { default: KnowledgeBaseSearch } = await import(
+            "@/pages/KnowledgeBase/Search"
+          );
+          return { element: <PrivateRoute Component={KnowledgeBaseSearch} /> };
+        },
+      },
+      {
+        path: "/knowledge-base/file-ops",
+        lazy: async () => {
+          const { default: KnowledgeBaseFileOps } = await import(
+            "@/pages/KnowledgeBase/FileOps"
+          );
+          return {
+            element: <PrivateRoute Component={KnowledgeBaseFileOps} />,
+          };
+        },
+      },
       // Catch-all route for 404s
       {
         path: "*",

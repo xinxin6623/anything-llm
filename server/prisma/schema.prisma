@@ -393,3 +393,40 @@ model workspace_parsed_files {
   @@index([workspaceId])
   @@index([userId])
 }
+
+// ─── Knowledge Base Manager ───────────────────────────────────────────────────
+
+model kb_files {
+  id             String   @id @default(uuid())
+  file_path      String   @unique
+  file_hash      String?
+  file_name      String
+  file_type      String?
+  file_size      Int      @default(0)
+  category       String?
+  sub_category   String?
+  summary        String?
+  keywords       String   @default("[]")
+  status         String   @default("pending")
+  error_msg      String?
+  indexed_at     DateTime?
+  embedded_at    DateTime?
+  workspace_slug String?
+  doc_location   String?
+  createdAt      DateTime @default(now())
+  lastUpdatedAt  DateTime @default(now())
+
+  @@index([status])
+  @@index([category])
+  @@index([file_hash])
+}
+
+model kb_operations {
+  id          String   @id @default(uuid())
+  operation   String
+  file_id     String?
+  old_value   String?
+  new_value   String?
+  rolled_back Int      @default(0)
+  createdAt   DateTime @default(now())
+}

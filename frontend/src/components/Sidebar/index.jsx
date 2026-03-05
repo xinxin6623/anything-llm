@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { List, Plus } from "@phosphor-icons/react";
+import { List, Plus, Brain } from "@phosphor-icons/react";
 import NewWorkspaceModal, {
   useNewWorkspaceModal,
 } from "../Modals/NewWorkspace";
@@ -8,7 +8,7 @@ import useLogo from "@/hooks/useLogo";
 import useUser from "@/hooks/useUser";
 import Footer from "../Footer";
 import SettingsButton from "../SettingsButton";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import paths from "@/utils/paths";
 import { useTranslation } from "react-i18next";
 import { useSidebarToggle, ToggleSidebarButton } from "./SidebarToggle";
@@ -64,6 +64,7 @@ export default function Sidebar() {
                   <div className="flex flex-col gap-y-[14px]">
                     <SearchBox user={user} showNewWsModal={showNewWsModal} />
                     <ActiveWorkspaces />
+                    <KnowledgeBaseButton />
                   </div>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 pb-3 rounded-b-[16px] bg-theme-bg-sidebar light:bg-slate-200 bg-opacity-80 backdrop-filter backdrop-blur-md z-10">
@@ -207,6 +208,26 @@ function NewWorkspaceButton({ user, showNewWsModal }) {
   );
 }
 
+function KnowledgeBaseButton() {
+  const location = useLocation();
+  const isActive = location.pathname.startsWith("/knowledge-base");
+  return (
+    <Link
+      to={paths.knowledgeBase.home()}
+      className={`flex items-center gap-x-2 px-3 py-2 rounded-lg transition-all duration-200 group ${
+        isActive
+          ? "bg-white/20 text-white"
+          : "text-theme-text-secondary hover:bg-white/10 hover:text-white"
+      }`}
+      data-tooltip-id="kb-nav-btn"
+      data-tooltip-content="知识库管理"
+    >
+      <Brain className="h-5 w-5 flex-shrink-0" />
+      <span className="text-sm font-medium truncate">知识库管理</span>
+    </Link>
+  );
+}
+
 function WorkspaceAndThreadTooltips() {
   return createPortal(
     <React.Fragment>
@@ -218,6 +239,12 @@ function WorkspaceAndThreadTooltips() {
       />
       <Tooltip
         id="workspace-thread-name"
+        place="right"
+        delayShow={800}
+        className="tooltip !text-xs z-99"
+      />
+      <Tooltip
+        id="kb-nav-btn"
         place="right"
         delayShow={800}
         className="tooltip !text-xs z-99"

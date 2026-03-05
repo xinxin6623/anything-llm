@@ -229,4 +229,15 @@ export default {
       manage: () => `/settings/beta-features/live-document-sync/manage`,
     },
   },
+
+  knowledgeBase: {
+    home: () => `/knowledge-base`,
+    quickStart: () => `/knowledge-base/quick-start`,
+    config: () => `/knowledge-base/config`,
+    files: () => `/knowledge-base/files`,
+    categories: () => `/knowledge-base/categories`,
+    embed: () => `/knowledge-base/embed`,
+    search: () => `/knowledge-base/search`,
+    fileOps: () => `/knowledge-base/file-ops`,
+  },
 };

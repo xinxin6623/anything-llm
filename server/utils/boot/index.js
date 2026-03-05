@@ -7,6 +7,19 @@ const eagerLoadContextWindows = require("./eagerLoadContextWindows");
 const markOnboarded = require("./markOnboarded");
 const { PushNotifications } = require("../PushNotifications");
 
+// 知识库监听器 - 延迟加载以避免循环依赖
+let KBWatcher = null;
+const startKBWatcher = async () => {
+  try {
+    if (!KBWatcher) {
+      KBWatcher = require("../KnowledgeBase/watcher").KBWatcher;
+    }
+    await KBWatcher.start();
+  } catch (error) {
+    console.log("[KBWatcher] 启动监听失败（可能未配置目录）:", error.message);
+  }
+};
+
 // Testing SSL? You can make a self signed certificate and point the ENVs to that location
 // make a directory in server called 'sslcert' - cd into it
 // - openssl genrsa -aes256 -passout pass:gsahdg -out server.pass.key 4096
@@ -37,6 +50,7 @@ function bootSSL(app, port = 3001) {
         new BackgroundService().boot();
         await eagerLoadContextWindows();
         await PushNotifications.setupPushNotificationService();
+        await startKBWatcher(); // 启动知识库监听器
         console.log(`Primary server in HTTPS mode listening on port ${port}`);
       })
       .on("error", catchSigTerms);
@@ -69,6 +83,7 @@ function bootHTTP(app, port = 3001) {
       new BackgroundService().boot();
       await eagerLoadContextWindows();
       await PushNotifications.setupPushNotificationService();
+      await startKBWatcher(); // 启动知识库监听器
       console.log(`Primary server in HTTP mode listening on port ${port}`);
     })
     .on("error", catchSigTerms);

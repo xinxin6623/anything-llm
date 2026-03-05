@@ -8,6 +8,7 @@ import {
   Browser,
   ChartBar,
   FileMagnifyingGlass,
+  BookBookmark,
 } from "@phosphor-icons/react";
 import RAGImage from "@/media/agents/rag-memory.png";
 import SummarizeImage from "@/media/agents/view-summarize.png";
@@ -72,5 +73,13 @@ export const configurableSkills = {
     title: "SQL Connector",
     component: AgentSQLConnectorSelection,
     skill: "sql-agent",
+  },
+  "kb-search": {
+    title: "Knowledge Base Search",
+    description:
+      "Enable the agent to search your personal knowledge base — find files by keyword or semantic meaning and return content snippets with source file paths.",
+    component: GenericSkillPanel,
+    skill: "kb-search",
+    icon: BookBookmark,
   },
 };
